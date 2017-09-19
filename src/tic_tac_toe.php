@@ -80,7 +80,6 @@ class Board
 
         for ($y = 0; $y < self::ROWS; $y++) {
             for ($x = 0; $x < self::COLUMNS; $x++) {
-
                 $positions[] = [$y, $x];
             }
         }
@@ -310,12 +309,12 @@ class AI
 		$blank_spaces = $board->getBlankPositions($board);
 		$position = NULL;
 		$position = test_go_for_win($board, false);
-		var_dump($position);
+		//var_dump($position);
 		if ($position == NULL) {
 			$position = test_prevent_loss($board);
-			var_dump($position);
+			//var_dump($position);
 			if ($position == NULL) {
-				var_dump($position);
+				//var_dump($position);
 				if (isset($blank_spaces)) {
 					$blank_space_count = sizeof($blank_spaces);
 					$rand_chooser = rand(0, $blank_space_count-1);
