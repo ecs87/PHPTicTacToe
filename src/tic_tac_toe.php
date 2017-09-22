@@ -139,36 +139,34 @@ class Board
     {
 		$playerWins = false;
 		$winnerDetected = false;
+		$rowCounter = 0;
+		$columnCounter = 0;
+		
 		//diag / (Player)
-		if ($movePosition->column + $movePosition->row == 3-1) { //we're on a diagonal
-			for ($i = 0; $i < 3; $i++) {
-				if ($board->getPieceAtPosition($i,(3 - 1)-$i) != Player::PIECE)
+		if ($movePosition->column + $movePosition->row == $board::ROWS-1) { //we're on a diagonal
+			for ($i = 0; $i < $board::ROWS; $i++) {
+				if ($board->getPieceAtPosition($i,($board::ROWS - 1)-$i) != Player::PIECE)
 					break;
-				if ($i == 3-1) 
+				if ($i == $board::ROWS-1) 
 					$playerWins = true;
 			}
 		}
 		//diag \ (Player)
 		if ($movePosition->column == $movePosition->row) { //we're on a diagonal
-			for ($i = 0; $i < 3; $i++) {
+			for ($i = 0; $i < $board::ROWS; $i++) {
 				if ($board->getPieceAtPosition($i,$i) != Player::PIECE)
 					break;
-				if ($i == 3-1) 
+				if ($i == $board::ROWS-1) 
 					$playerWins = true;
 			}
 		}
-		//column (Player)
-		for ($i = 0; $i < 3; $i++) {
-			if ($board->getPieceAtPosition($i, $movePosition->column) != Player::PIECE)
-				break;
-			if ($i == 3-1)
-				$playerWins = true;
-		}
-		//row (Player)
-		for ($i = 0; $i < 3; $i++) {
-			if ($board->getPieceAtPosition($movePosition->row, $i) != Player::PIECE)
-				break;
-			if ($i == 3-1)
+		//rows and columns (Player)
+		for ($i = 0; $i < $board::ROWS; $i++) {
+			if ($board->getPieceAtPosition($i, $movePosition->column) == Player::PIECE)
+				$columnCounter++;
+			if ($board->getPieceAtPosition($movePosition->row, $i) == Player::PIECE)
+				$rowCounter++;
+			if ($columnCounter == $board::COLUMNS || $rowCounter == $board::COLUMNS)
 				$playerWins = true;
 		}
 		return $playerWins;
