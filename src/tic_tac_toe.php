@@ -137,39 +137,28 @@ class Board
 
     public function getWinner($board, $movePosition)
     {
-		$playerWins = false;
-		$winnerDetected = false;
-		$rowCounter = 0;
-		$columnCounter = 0;
-		
-		//diag / (Player)
-		if ($movePosition->column + $movePosition->row == $board::ROWS-1) { //we're on a diagonal
-			for ($i = 0; $i < $board::ROWS; $i++) {
-				if ($board->getPieceAtPosition($i,($board::ROWS - 1)-$i) != Player::PIECE)
-					break;
-				if ($i == $board::ROWS-1) 
-					$playerWins = true;
-			}
-		}
-		//diag \ (Player)
-		if ($movePosition->column == $movePosition->row) { //we're on a diagonal
-			for ($i = 0; $i < $board::ROWS; $i++) {
-				if ($board->getPieceAtPosition($i,$i) != Player::PIECE)
-					break;
-				if ($i == $board::ROWS-1) 
-					$playerWins = true;
-			}
-		}
-		//rows and columns (Player)
-		for ($i = 0; $i < $board::ROWS; $i++) {
-			if ($board->getPieceAtPosition($i, $movePosition->column) == Player::PIECE)
-				$columnCounter++;
-			if ($board->getPieceAtPosition($movePosition->row, $i) == Player::PIECE)
-				$rowCounter++;
-			if ($columnCounter == $board::COLUMNS || $rowCounter == $board::COLUMNS)
-				$playerWins = true;
-		}
-		return $playerWins;
+		if ($board->getPieceAtPosition(0,0) == Player::PIECE && $board->getPieceAtPosition(0,1) == Player::PIECE && $board->getPieceAtPosition(0,2) == Player::PIECE
+            || $board->getPieceAtPosition(1,0) == Player::PIECE && $board->getPieceAtPosition(1,1) == Player::PIECE && $board->getPieceAtPosition(1,2) == Player::PIECE
+            || $board->getPieceAtPosition(2,0) == Player::PIECE && $board->getPieceAtPosition(2,1) == Player::PIECE && $board->getPieceAtPosition(2,2) == Player::PIECE
+            || $board->getPieceAtPosition(0,0) == Player::PIECE && $board->getPieceAtPosition(1,0) == Player::PIECE && $board->getPieceAtPosition(2,0) == Player::PIECE
+            || $board->getPieceAtPosition(0,1) == Player::PIECE && $board->getPieceAtPosition(1,1) == Player::PIECE && $board->getPieceAtPosition(2,1) == Player::PIECE
+			|| $board->getPieceAtPosition(0,2) == Player::PIECE && $board->getPieceAtPosition(1,2) == Player::PIECE && $board->getPieceAtPosition(2,2) == Player::PIECE
+			|| $board->getPieceAtPosition(0,0) == Player::PIECE && $board->getPieceAtPosition(1,1) == Player::PIECE && $board->getPieceAtPosition(2,2) == Player::PIECE
+			|| $board->getPieceAtPosition(0,2) == Player::PIECE && $board->getPieceAtPosition(1,1) == Player::PIECE && $board->getPieceAtPosition(2,0) == Player::PIECE
+        )
+            return Player::PIECE;
+		else if ($board->getPieceAtPosition(0,0) == AI::PIECE && $board->getPieceAtPosition(0,1) == AI::PIECE && $board->getPieceAtPosition(0,2) == AI::PIECE
+            || $board->getPieceAtPosition(1,0) == AI::PIECE && $board->getPieceAtPosition(1,1) == AI::PIECE && $board->getPieceAtPosition(1,2) == AI::PIECE
+            || $board->getPieceAtPosition(2,0) == AI::PIECE && $board->getPieceAtPosition(2,1) == AI::PIECE && $board->getPieceAtPosition(2,2) == AI::PIECE
+            || $board->getPieceAtPosition(0,0) == AI::PIECE && $board->getPieceAtPosition(1,0) == AI::PIECE && $board->getPieceAtPosition(2,0) == AI::PIECE
+            || $board->getPieceAtPosition(0,1) == AI::PIECE && $board->getPieceAtPosition(1,1) == AI::PIECE && $board->getPieceAtPosition(2,1) == AI::PIECE
+			|| $board->getPieceAtPosition(0,2) == AI::PIECE && $board->getPieceAtPosition(1,2) == AI::PIECE && $board->getPieceAtPosition(2,2) == AI::PIECE
+			|| $board->getPieceAtPosition(0,0) == AI::PIECE && $board->getPieceAtPosition(1,1) == AI::PIECE && $board->getPieceAtPosition(2,2) == AI::PIECE
+			|| $board->getPieceAtPosition(0,2) == AI::PIECE && $board->getPieceAtPosition(1,1) == AI::PIECE && $board->getPieceAtPosition(2,0) == AI::PIECE
+        )
+			return AI::PIECE;
+		else
+			return false;
     }
 
     /**
@@ -299,10 +288,6 @@ class AI
 		$position = NULL;
 		try {
 			$this->goForWin($board, false);
-			echo 'Winner: AI';
-			$actual = (string)$board;
-			echo "\nWinning Board:\n", debug_board($actual), "\n";
-			exit(1);
 		} catch (\Exception $e) {
 			try {
 				$this->preventLoss($board);
@@ -378,29 +363,6 @@ class AI
 		if ($position != true)
 			throw new \Exception('AI Did not prevent Player from winning');
 		return $position;
-	}
-}
-
-function testForExistingPiece($board, $position) {
-	$valid = !$board->hasPieceAtPosition($position[0], $position[1]);
-	if (!$valid) {
-		//echo "Piece already at this position\n";
-	}
-	return $valid;
-}
-
-/**
- * @throws Exception If the AI does not prevent the player from winning
- */
-function test_prevent_loss($board)
-{
-	$board = new Board;
-	$ai    = new AI;
-	$board->addPiece(0, 2, Player::PIECE);
-	$board->addPiece(1, 1, Player::PIECE);
-	$ai->placePiece($board);
-	if ($board->getPieceAtPosition(2, 0) !== AI::PIECE) {
-		throw new \Exception('AI Should try to prevent player from winning');
 	}
 }
 
@@ -513,7 +475,7 @@ function test_diag2($board, $movePos, $pieceGet, $blank_space)
 /**
  * @throws Exception If the AI does not go for the win
  */
-function test_go_for_win($board, $isBlocking)
+function test_go_for_win()
 {
     $board = new Board;
     $ai    = new AI;
@@ -523,6 +485,21 @@ function test_go_for_win($board, $isBlocking)
     if ($board->getPieceAtPosition(0, 2) !== AI::PIECE) {
         throw new \Exception('AI Should go for win');
     }
+}
+
+/**
+ * @throws Exception If the AI does not prevent the player from winning
+ */
+function test_prevent_loss()
+{
+	$board = new Board;
+	$ai    = new AI;
+	$board->addPiece(0, 2, Player::PIECE);
+	$board->addPiece(1, 1, Player::PIECE);
+	$ai->placePiece($board);
+	if ($board->getPieceAtPosition(2, 0) !== AI::PIECE) {
+		throw new \Exception('AI Should try to prevent player from winning');
+	}
 }
 
 function debug_board($board)
@@ -585,7 +562,7 @@ function test_player_wins()
 	$board->addPiece(2, 0, Player::PIECE);
     $movePos->row = 2; $movePos->column = 0;
 	//$movePos = $player->placePiece($board); //manual input testing
-    if ($board->getWinner($board, $movePos) !== true) {
+    if ($board->getWinner($board, $movePos) !== Player::PIECE) {
         throw new \Exception("Player should be able to win");
     }
 }
@@ -594,13 +571,13 @@ function run_tests()
 {
     test_display_board();
     test_player_wins();
-	init();
     test_go_for_win();
     test_prevent_loss();
 }
 
 try {
     run_tests();
+	init_GameLoop();
 } catch (\Exception $e) {
     echo "Tests failed, game aborted\nMessage: ", $e->getMessage(), "\n";
     exit(1);
@@ -623,30 +600,41 @@ try {
  *
  * If the board is full, display a message and exit
  */
-function init() {
+function init_GameLoop() {
 	$board  = new Board;
 	$ai     = new AI;
 	$player = new Player;
 	$movePos = new stdclass;
 	while (!empty($board->getBlankPositions($board))) {
-		//check if the Player has won
-		if ($board->getWinner($board, $movePos) == true) {
-			echo "\nPlayer Wins!\n";
+		//AI moves first
+		$movePos = $ai->placePiece($board);
+		//if board is full (no one has won)
+		if (empty($board->getBlankPositions($board))) {
+			echo "\nBoard is full: TIE!\n";
 			$actual = (string)$board;
 			echo "\nBoard:\n", debug_board($actual), "\n";
 			exit();
 		}
-		//AI moves first
-		$movePos = $ai->placePiece($board);
 		$actual = (string)$board;
 		echo "\nBoard:\n", debug_board($actual), "\n";
-		//if board is full (no one has won)
-		if (empty($board->getBlankPositions($board))) {
-			echo "Board is full: TIE!";
+		//check if the Player or AI has won
+		$PlayerOrAIWinner = $board->getWinner($board, $movePos);
+		if ($PlayerOrAIWinner != NULL) {
+			echo "\n".$PlayerOrAIWinner." WINS!\n";
+			$actual = (string)$board;
+			echo "\nBoard:\n", debug_board($actual), "\n";
 			exit();
 		}
 		//Player moves second
 		$movePos = $player->placePiece($board);
+		//check if the Player or AI has won
+		$PlayerOrAIWinner = $board->getWinner($board, $movePos);
+		if ($PlayerOrAIWinner != NULL) {
+			echo "\n".$PlayerOrAIWinner." WINS!\n";
+			$actual = (string)$board;
+			echo "\nBoard:\n", debug_board($actual), "\n";
+			exit();
+		}
 	}
 }
 ?>
